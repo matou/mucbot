@@ -22,7 +22,9 @@ class Mucbot(Thread):
         if botname == '':
             botname = jid.getNode()
 
+        self.jid = jid
         self.room = room
+        self.botname = botname
 
         self.client = xmpp.Client(jid.getDomain(), debug=[])
         self.client.connect()
