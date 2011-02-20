@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
     jid = xmpp.JID('user@jabber.example.org')
     pwd = 'mypassword'
-    room = 'room@conference.jabber.example.org')
+    room = 'room@conference.jabber.example.org'
 
     examplebot = Mucbot(jid, pwd, room)
     examplebot.say("hello world")
