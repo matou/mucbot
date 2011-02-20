@@ -1,0 +1,19 @@
+mucbot
+======
+
+A simple extensible multiuser chat bot for xmpp muc. 
+
+
+Dependencies
+============
+
+mucbot requires xmpppy (<http://xmpppy.sourceforge.net/>)
+
+
+License
+=======
+
+mucbot is distributed under the terms of GNU General Public License[0] and can 
+be freely redistributed without any charge.
+
+[0] <http://www.gnu.org/licenses/gpl.txt>
