@@ -48,6 +48,9 @@ class Mucbot(Thread):
         m = xmpp.Message(to=self.room, body=msg, typ='groupchat')
         self.client.send(m)
 
+    def getClient(self):
+        return self.client
+
     def run(self):
         pass
 
