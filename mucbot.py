@@ -10,14 +10,14 @@
 ##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ##   GNU General Public License for more details.
 
-import xmpp, time
+import xmpp, time, re
 from threading import Thread
 from random import randint
 
 class Mucbot(Thread):
     
     def __init__(self, jid, pwd, room, botname='', roompwd='', quotes=[],
-            minwait=-1, maxwait=-1):
+            minwait=-1, maxwait=-1, reactions={}):
         '''initalize bot and let it join the room'''
         Thread.__init__(self)
 
@@ -35,6 +35,14 @@ class Mucbot(Thread):
         # minimum and maximum time to wait before quoting something
         self.minwait = minwait
         self.maxwait = maxwait
+        # a dictionary containing reactions. the keys have to be 
+        # regular expressions pattern as strings and the value a list of 
+        # reactions from which one will be picked randomly
+        self.reactions = reactions
+
+        # compile the patterns
+        for key in self.reactions.keys():
+            self.reactions[re.compile(key)] = self.reactions.pop(key)
 
         self.client = xmpp.Client(jid.getDomain(), debug=[])
         self.client.connect()
@@ -48,11 +56,15 @@ class Mucbot(Thread):
 
     def msg_rcv(self, sess, msg):
         '''will be executed when a message arrives'''
-        react(self, msg.getBody())
+        self.react(msg.getBody())
         pass
 
     def react(self, msg):
-        pass
+        for pattern in self.reactions.keys():
+            print "trying to find %s in %s" % (pattern, msg)
+            if pattern.search(msg):
+                self.say(self.reactions[pattern][randint(0,len(self.reactions[pattern])-1)])
+                return
 
     def pres_rcv(self, sess, pres):
         pass
