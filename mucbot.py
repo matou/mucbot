@@ -51,7 +51,14 @@ class Mucbot(Thread):
     def getClient(self):
         return self.client
 
+    def processing(self):
+        while True:
+            self.client.Process(1)
+
     def run(self):
+        processor = Thread()
+        processor.run = self.processing
+        processor.start()
         pass
 
 
