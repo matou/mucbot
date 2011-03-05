@@ -12,19 +12,29 @@
 
 import xmpp, time
 from threading import Thread
+from random import randint
 
 class Mucbot(Thread):
     
-    def __init__(self, jid, pwd, room, botname='', roompwd=''):
+    def __init__(self, jid, pwd, room, botname='', roompwd='', quotes=[],
+            minwait=-1, maxwait=-1):
         '''initalize bot and let it join the room'''
         Thread.__init__(self)
 
         if botname == '':
             botname = jid.getNode()
 
+        # the jid of the bot
         self.jid = jid
+        # the room to join
         self.room = room
+        # the nick to appear with
         self.botname = botname
+        # quotes to tell periodical
+        self.quotes = quotes
+        # minimum and maximum time to wait before quoting something
+        self.minwait = minwait
+        self.maxwait = maxwait
 
         self.client = xmpp.Client(jid.getDomain(), debug=[])
         self.client.connect()
@@ -38,6 +48,10 @@ class Mucbot(Thread):
 
     def msg_rcv(self, sess, msg):
         '''will be executed when a message arrives'''
+        react(self, msg.getBody())
+        pass
+
+    def react(self, msg):
         pass
 
     def pres_rcv(self, sess, pres):
@@ -59,7 +73,13 @@ class Mucbot(Thread):
         processor = Thread()
         processor.run = self.processing
         processor.start()
-        pass
+        if self.minwait==-1 or self.maxwait==-1:
+            return
+        while True:
+            r = randint(self.minwait, self.maxwait)
+            time.sleep(r)
+            self.say(self.quotes[randint(0,len(self.quotes)-1)])
+
 
 
 if __name__ == '__main__':
