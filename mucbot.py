@@ -58,8 +58,15 @@ class Mucbot(Thread):
 
     def msg_rcv(self, sess, msg):
         '''will be executed when a message arrives'''
+
+        # ignore messages that come from this bot
+        sender = str(msg.getFrom())
+        if len(sender.split('/')) > 1:
+            sender = sender.split('/')[1]
+        if sender.lower().find(self.botname) >= 0:
+            return
+
         self.react(msg.getBody())
-        pass
 
     def react(self, msg):
         time.sleep(self.delay)
