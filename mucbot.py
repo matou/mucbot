@@ -17,7 +17,7 @@ from random import randint
 class Mucbot(Thread):
     
     def __init__(self, jid, pwd, room, botname='', roompwd='', quotes=[],
-            minwait=-1, maxwait=-1, reactions={}):
+            minwait=-1, maxwait=-1, reactions={}, delay=3):
         '''initalize bot and let it join the room'''
         Thread.__init__(self)
 
@@ -39,6 +39,8 @@ class Mucbot(Thread):
         # regular expressions pattern as strings and the value a list of 
         # reactions from which one will be picked randomly
         self.reactions = reactions
+        # seconds to wait before replying
+        self.delay = delay
 
         # compile the patterns
         for key in self.reactions.keys():
@@ -60,6 +62,7 @@ class Mucbot(Thread):
         pass
 
     def react(self, msg):
+        time.sleep(self.delay)
         for pattern in self.reactions.keys():
             print "trying to find %s in %s" % (pattern, msg)
             if pattern.search(msg):
