@@ -37,7 +37,9 @@ class Mucbot(Thread):
         self.maxwait = maxwait
         # a dictionary containing reactions. the keys have to be 
         # regular expressions pattern as strings and the value a list of 
-        # reactions from which one will be picked randomly
+        # reactions from which one will be picked randomly. it's sufficient to
+        # consider the lower case since every message body will be made lower
+        # case before parsing it.
         self.reactions = reactions
         # seconds to wait before replying
         self.delay = delay
@@ -69,6 +71,9 @@ class Mucbot(Thread):
         self.react(msg.getBody())
 
     def react(self, msg):
+        '''react to a message by searching for all patterns and replying with
+        the matching answer'''
+        msg = msg.lower()
         time.sleep(self.delay)
         for pattern in self.reactions.keys():
             print "trying to find %s in %s" % (pattern, msg)
