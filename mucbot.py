@@ -10,7 +10,7 @@
 ##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ##   GNU General Public License for more details.
 
-import xmpp, time, re
+import xmpp, time, re, logging
 from threading import Thread
 from random import randint
 
@@ -63,12 +63,12 @@ class Mucbot(Thread):
         p.getTag('x').addChild('history', {'maxchars':'0', 'maxstanzas':'0'})
         self.client.send(p)
 
+        logging.info('%s joined %s' % (botname, room))
+
     def msg_rcv(self, sess, msg):
         '''will be executed when a message arrives'''
 
-        # first execute all given handlers
-        for handler in self.rcv_handler:
-            self.rcv_handler(msg.getFrom(), msg.getBody())
+        logging.debug('received message')
 
         # ignore messages that come from this bot
         sender = str(msg.getFrom())
@@ -77,11 +77,17 @@ class Mucbot(Thread):
         if sender.lower().find(self.botname) >= 0:
             return
 
+
+        # first execute all given handlers
+        for handler in self.rcv_handler:
+            handler(self, msg.getFrom(), msg.getBody())
+
         self.react(msg.getBody())
 
     def react(self, msg):
         '''react to a message by searching for all patterns and replying with
         the matching answer'''
+        logging.debug(msg)
         msg = msg.lower()
         time.sleep(self.delay)
         for pattern in self.reactions.keys():
@@ -115,6 +121,7 @@ class Mucbot(Thread):
             return
         while True:
             r = randint(self.minwait, self.maxwait)
+            logging.info('waiting %d seconds before next quote' % r)
             time.sleep(r)
             self.say(self.quotes[randint(0,len(self.quotes)-1)])
 
