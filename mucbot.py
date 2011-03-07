@@ -16,8 +16,9 @@ from random import randint
 
 class Mucbot(Thread):
     
-    def __init__(self, jid, pwd, room, botname='', roompwd='', quotes=[],
-            minwait=-1, maxwait=-1, reactions={}, delay=3):
+    def __init__(self, jid, pwd, room, botname='', roompwd='', greeting=[], 
+            quotes=[], minwait=-1, maxwait=-1, reactions={}, delay=3, 
+            rcv_handler=[]):
         '''initalize bot and let it join the room'''
         Thread.__init__(self)
 
@@ -39,10 +40,14 @@ class Mucbot(Thread):
         # regular expressions pattern as strings and the value a list of 
         # reactions from which one will be picked randomly. it's sufficient to
         # consider the lower case since every message body will be made lower
-        # case before parsing it.
+        # case before parsingiit.
         self.reactions = reactions
         # seconds to wait before replying
         self.delay = delay
+        # a list of handlers that will be executed when a message is received
+        self.rcv_handler = rcv_handler
+        # a list of possible greetings when the bot enters a room
+        self.greeting = greeting
 
         # compile the patterns
         for key in self.reactions.keys():
@@ -61,6 +66,10 @@ class Mucbot(Thread):
     def msg_rcv(self, sess, msg):
         '''will be executed when a message arrives'''
 
+        # first execute all given handlers
+        for handler in self.rcv_handler:
+            self.rcv_handler(msg.getFrom(), msg.getBody())
+
         # ignore messages that come from this bot
         sender = str(msg.getFrom())
         if len(sender.split('/')) > 1:
@@ -76,7 +85,6 @@ class Mucbot(Thread):
         msg = msg.lower()
         time.sleep(self.delay)
         for pattern in self.reactions.keys():
-            print "trying to find %s in %s" % (pattern, msg)
             if pattern.search(msg):
                 self.say(self.reactions[pattern][randint(0,len(self.reactions[pattern])-1)])
                 return
@@ -100,6 +108,9 @@ class Mucbot(Thread):
         processor = Thread()
         processor.run = self.processing
         processor.start()
+        time.sleep(self.delay)
+        if len(self.greeting) > 0:
+            self.say(self.greeting[randint(0, len(self.greeting)-1)])
         if self.minwait==-1 or self.maxwait==-1:
             return
         while True:
