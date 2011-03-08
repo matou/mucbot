@@ -31,6 +31,8 @@ class Mucbot(Thread):
         self.room = room
         # the nick to appear with
         self.botname = botname
+        # the password for the room
+        self.roompwd = roompwd
         # quotes to tell periodical
         self.quotes = quotes
         # minimum and maximum time to wait before quoting something
@@ -58,12 +60,17 @@ class Mucbot(Thread):
         self.client.RegisterHandler('message', self.msg_rcv)
         self.client.RegisterHandler('presence', self.pres_rcv)
         self.client.auth(jid.getNode(), pwd, resource=jid.getResource())
-        p = xmpp.Presence(to='%s/%s' % (room, botname))
-        p.setTag('x', namespace=xmpp.NS_MUC).setTagData('password', roompwd)
+
+        self.join_room()
+
+    def join_room(self):
+        p = xmpp.Presence(to='%s/%s' % (self.room, self.botname))
+        p.setTag('x', namespace=xmpp.NS_MUC).setTagData('password', self.roompwd)
         p.getTag('x').addChild('history', {'maxchars':'0', 'maxstanzas':'0'})
         self.client.send(p)
 
-        logging.info('%s joined %s' % (botname, room))
+        logging.info('%s joined %s' % (self.botname, self.room))
+        
 
     def msg_rcv(self, sess, msg):
         '''will be executed when a message arrives'''
