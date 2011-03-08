@@ -69,6 +69,8 @@ class Mucbot(Thread):
         p.getTag('x').addChild('history', {'maxchars':'0', 'maxstanzas':'0'})
         self.client.send(p)
 
+        self.jointime = time.time()
+
         logging.info('%s joined %s' % (self.botname, self.room))
         
 
