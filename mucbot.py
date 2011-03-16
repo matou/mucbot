@@ -105,7 +105,12 @@ class Mucbot(Thread):
                 return
 
     def pres_rcv(self, sess, pres):
-        pass
+        # ignore messages that come from this bot
+        sender = str(pres.getFrom())
+        if len(sender.split('/')) > 1:
+            sender = sender.split('/')[1]
+        if sender.lower().find(self.botname) >= 0:
+            return
 
     def say(self, msg):
         '''send the given message to the room'''
